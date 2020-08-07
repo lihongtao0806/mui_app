@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>首页</title>
+		<link href="css/mui.css" rel="stylesheet" type="text/css" />
+		<link href="css/iconfont.css" rel="stylesheet" type="text/css" />
+		<link href="css/ol.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">
+			.map {
+				height: calc(100vh);
+				width: 100%;
+			}
+
+			.map-btn {
+				position: absolute;
+				z-index: 200;
+				right: 10px;
+				width: 48px;
+				height: 48px;
+			}
+
+			.map-btn i {
+				font-size: 24px;
+				line-height: 24px;
+			}
+
+			.map-btn p {
+				font-size: 12px;
+				line-height: 12px;
+			}
+
+			#btn-msg {
+				top: 60px;
+			}
+
+			#btn-layers {
+				top: 120px;
+			}
+
+			#btn-review {
+				top: 180px;
+			}
+
+			#btn_functions {
+				top: 240px;
+				display: none;
+			}
+
+			/* .text-top-center {
+				position: absolute;
+				z-index: 999;
+				top: 10%;
+				color: white;
+				text-align: center;
+			} */
+
+			.mui-title {
+				font-size: 14px;
+			}
+		</style>
+	</head>
+	<body onload="app.route()">
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 id="title" class="mui-title"></h1>
+		</header>
+		<div class="mui-content">
+			<div id="map" class="map">
+
+			</div>
+			<div id="" class="map-center-icon">
+				<img id="dituCenter" src="asset/images/ditu-center.png" />
+			</div>
+		</div>
+	</body>
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/ol.js"></script>
+	<script src="js/mui.js"></script>
+	<script src="js/app.js"></script>
+	<script src="https://webapi.amap.com/maps?v=1.4.15&key=366357a89ebbb8019eb0d86d19b3bacb"></script>
+	<script src="js/LonLatUtil.js"></script>
+	<script type="text/javascript" charset="utf-8">
+		//地图对象
+		var map = null;
+		var btnMsg = null;
+
+		$(document).ready(function() {
+			mui.init();
+			mui.plusReady(function() {
+				init();
+			})
+		});
+
+		function init() {
+			initLocation();
+			initView();
+			initListener();
+		}
+
+		function initView() {
+			btnMsg = $("#btn-msg");
+
+			//初始化地图中心点图标[该图标永远都不会动，固定在地图中央]
+			var width = document.documentElement.clientWidth;
+			var height = document.documentElement.clientHeight;
+			var dituCenter = $("#dituCenter");
+			var top = "" + (height / 2 - 40 + 44) + "px";
+			var left = "" + (width / 2 - 20) + "px";
+			// console.log(top+" , "+left);
+			dituCenter.css({
+				"top": top,
+				"left": left,
+				"position": "absolute",
+				"z-index": "999",
+				"width": "40px",
+				"height": "40px"
+			});
+		}
+
+		function initListener() {
+			btnMsg.click(function() {
+				app.open("saveAndUpload.html");
+			});
+		}
+
+		function initLocation() {
+
+			plus.geolocation.getCurrentPosition(function(p) {
+				// console.log("定位结果--->" + JSON.stringify(p));
+				// console.log('Geolocation：\nLatitude:' + p.coords.latitude + '\nLongitude:' + p.coords.longitude );
+
+				//GCJ-02【高德地图】 to WGS-84【天地图】
+				var latLng = GPS.gcj_decrypt(p.coords.latitude, p.coords.longitude);
+				// console.log("--->"+JSON.stringify(latLng))
+				initMap(map, latLng.lat, latLng.lng);
+			}, function(e) {
+				alert('Geolocation error: ' + e.message);
+				console.log('Geolocation error: ' + e.message);
+			}, {
+				provider: 'amap',
+				coordsType: 'gcj02'
+			});
+		}
+
+		/**
+		 * 初始化地图
+		 * @param {Object} map
+		 * @param {Object} latitude 纬度
+		 * @param {Object} longitude 经度
+		 */
+		function initMap(map, latitude, longitude) {
+			// console.log("latitude="+latitude+" ,longitude="+longitude);
+			var baoshan = new ol.proj.fromLonLat([longitude, latitude]);
+			//天地图底图---基本图层
+			tiandi1 = new ol.layer.Tile({
+				source: new ol.source.XYZ({
+					url: 'http://t{0-7}.tianditu.gov.cn/DataServer?T=vec_w&x={x}&y={y}&l={z}&tk=53ed32eb4b23c6607c2f1d8616ecf217',
+				})
+			});
+			//天地图底图---矢量图
+			tiandi2 = new ol.layer.Tile({
+				source: new ol.source.XYZ({
+					url: 'http://t{0-7}.tianditu.gov.cn/DataServer?T=cta_w&x={x}&y={y}&l={z}&tk=53ed32eb4b23c6607c2f1d8616ecf217',
+				})
+			});
+			tiandi3 = new ol.layer.Tile({
+				source: new ol.source.XYZ({
+					url: 'http://t{0-7}.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=53ed32eb4b23c6607c2f1d8616ecf217',
+				})
+			});
+			//宝山底图
+			qp1 = new ol.layer.Tile({
+				source: new ol.source.TileWMS({
+					url: 'http://221.181.88.134:6706/geoserver/sunt_sh/wms?service=WMS',
+					params: {
+						'layers': 'sunt_sh:baoshan_utm',
+						'singleTile': false
+					}
+				})
+			});
+			
+			//宝山河道图层
+			qp2 = new ol.layer.Tile({
+				source: new ol.source.TileWMS({
+					url: 'http://221.181.88.134:6706/geoserver/sunt_sh/wms?service=WMS',
+					params: {
+						'layers': 'sunt_sh:baoshan_water_utm',
+						'singleTile': false
+					}
+				})
+			});
+
+			map = new ol.Map({
+				//这个target对应一个div的id
+				target: 'map',
+				layers: [
+					tiandi1,
+					tiandi2,
+					tiandi3,
+					// qp1,
+					qp2
+				],
+				controls: [],
+				view: new ol.View({
+					//禁止旋转
+					enableRotation: false,
+					//地图中心点
+					center: baoshan,
+					//缩放级别 16
+					zoom: 18,
+					//地图缩放最小级别
+					minZoom: 1,
+					//地图缩放最大级别
+					maxZoom: 18
+				})
+			});
+
+			// 地图停止移动监听
+			map.on("moveend", function(evt) {
+				var extent = evt.frameState.extent;
+				var lon = (extent[0] + extent[2]) / 2;
+				var lat = (extent[1] + extent[3]) / 2
+				// console.log("lon=" + lon + " ,lat=" + lat);
+
+				// EPSG:4326 (WGS84，即GPS)，这里将EPSG:3857坐标转为EPSG:4326，返回数组形式
+				var lnglat = ol.proj.transform([lon, lat], 'EPSG:3857', 'EPSG:4326');
+				// console.log("天地图坐标--->"+lnglat);
+
+				//WGS-84 to GCJ-02
+				var latlngJson = GPS.gcj_encrypt(lnglat[1], lnglat[0]);
+				var lnglatArr = [latlngJson.lng, latlngJson.lat];
+				// console.log("latlngJson--->"+JSON.stringify(latlngJson));
+				// console.log("高德地图坐标--->"+lnglatArr);
+
+				AMap.plugin('AMap.Geocoder', function() {
+					var geocoder = new AMap.Geocoder({})
+					geocoder.getAddress(lnglatArr, function(status, result) {
+						if (status === 'complete' && result.info === 'OK') {
+							// result为对应的地理位置详细信息
+							// console.log("详细的地理位置信息--->"+JSON.stringify(result));
+							var address = result.regeocode.formattedAddress; //详细地址
+							var province = result.regeocode.addressComponent.province; //市
+							var district = result.regeocode.addressComponent.district; //区
+							var township = result.regeocode.addressComponent.township; //镇
+							var self = plus.webview.currentWebview();
+							var opener = self.opener();
+							mui.fire(opener, 'getLocation', {
+								"location": {
+									"lon": lnglat[0],
+									"lat": lnglat[1],
+									"address": address,
+									"province": province,
+									"district": district,
+									"township": township
+								}
+							});
+							$("#title").html(address);
+						}
+					})
+				}) //end for 经纬度逆向地理编码
+
+
+			}); //end for 移动监听
+
+			/*当前定位点画到底图上去，打死的那种，不能移动*/
+			//数据源
+			vectorSource = new ol.source.Vector();
+			//图层
+			vectorLayer = new ol.layer.Vector({
+				visible: true,
+				key: 1,
+				name: "要素图层",
+				source: vectorSource
+			});
+			//地图添加图层
+			map.addLayer(vectorLayer);
+
+			initLocationIcon(vectorSource, baoshan);
+			initEvidenceFeatures(vectorSource);
+		}
+
+		function initEvidenceFeatures(vectorSource) {
+			var evidenceData = JSON.parse(app.getSetting("waterEvidenceData"));
+			
+			//覆盖物样式
+			var style = new ol.style.Style({
+				image: new ol.style.Icon(({
+					anchor: [0.5, 0.5], //图标锚点位置，单位由anchorXUnits和anchorYUnits确定，缺省为百分比；[0.5,0.5]图标的中心位置
+					anchorOrigin: 'top-left', //原点位置，取值为bottom-left, bottom-right, top-left 或 top-right;
+					// anchorXUnits: 'fraction',//图标锚点位置x轴的单位，缺省是百分比，可设置为'pixels'（有s）
+					// anchorYUnits: 'pixels',//图标锚点位置y轴的单位，缺省是百分比，可设置为'pixels'（有s）
+					// offsetOrigin: 'top-right',
+					// offset:[0,10],
+					scale: 0.5, //缩放比例
+					opacity: 0.75, //透明度
+					src: './asset/images/evidence.png'
+				}))
+			});
+			
+			for (key of evidenceData) {
+				// console.log(JSON.stringify(key));
+				var hengjiang = new ol.proj.fromLonLat([key.lon, key.lat]);
+				//覆盖物【点】
+				var feature = new ol.Feature({
+					geometry: new ol.geom.Point(hengjiang),
+					// geometry:new LineString,
+					// name: '中恒泾',
+					reportSerialId: key.reportSerialId,
+					reportFoundtime: key.reportFoundtime,
+					reportPlaceDescribe: key.reportPlaceDescribe,
+					problemDescribe: key.problemDescribe,
+					population: 2115
+				});
+				//要素添加样式
+				feature.setStyle(style);
+			
+				//数据源添加要素
+				vectorSource.addFeature(feature);
+			}
+		}
+
+		function initLocationIcon(vectorSource, baoshan) {
+			//覆盖物样式
+			var style = new ol.style.Style({
+				image: new ol.style.Icon(({
+					anchor: [0.5, 0.5], //图标锚点位置，单位由anchorXUnits和anchorYUnits确定，缺省为百分比；[0.5,0.5]图标的中心位置
+					anchorOrigin: 'top-left', //原点位置，取值为bottom-left, bottom-right, top-left 或 top-right;
+					// anchorXUnits: 'fraction',//图标锚点位置x轴的单位，缺省是百分比，可设置为'pixels'（有s）
+					// anchorYUnits: 'pixels',//图标锚点位置y轴的单位，缺省是百分比，可设置为'pixels'（有s）
+					// offsetOrigin: 'top-right',
+					// offset:[0,10],
+					scale: 0.5, //缩放比例
+					opacity: 0.75, //透明度
+					src: './asset/images/dingwei.png'
+				}))
+			});
+
+			//覆盖物【点】
+			var feature = new ol.Feature({
+				geometry: new ol.geom.Point(baoshan),
+				// geometry:new LineString,
+				name: '当前定位点要素',
+				population: 2115
+			});
+			//要素添加样式
+			feature.setStyle(style);
+
+			//数据源添加要素
+			vectorSource.addFeature(feature);
+		}
+
+		function convert16(length, value) {
+			// console.log("--->length="+length+" ,value="+value);
+			var v = Math.abs(value);
+			var s = v.toString(16);
+			var len = length - s.length;
+			var tmp = "";
+			for (var i = 0; i < len; i++) {
+				tmp += "0";
+			}
+			return tmp + s;
+		}
+	</script>
+</html>

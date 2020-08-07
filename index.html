@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>首页</title>
+		<link href="css/mui.css" rel="stylesheet" type="text/css" />
+		<link href="css/iconfont.css" rel="stylesheet" type="text/css" />
+		<link href="css/ol.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">
+			.map {
+				height: calc(100vh);
+				width: 100%;
+			}
+
+			.map-btn {
+				position: absolute;
+				z-index: 200;
+				right: 10px;
+				width: 48px;
+				height: 48px;
+			}
+			.map-btn2 {
+				position: absolute;
+				z-index: 200;
+				right: 10px;
+				/* width: 48px; */
+				/* height: 48px; */
+			}
+
+			.map-btn i {
+				font-size: 24px;
+				line-height: 24px;
+			}
+
+			.map-btn p {
+				font-size: 12px;
+				line-height: 12px;
+			}
+
+			#btn-evidence {
+				top: 20px;
+			}
+
+			#btn-layers {
+				top: 80px;
+			}
+
+			#btn-review {
+				top: 140px;
+			}
+
+			#btn-mine {
+				top: 200px;
+			}
+
+			#btn-layer {
+				top: 260px;
+			}
+			
+			#btn-location{
+				bottom:50px;
+				position: absolute;
+				z-index: 200;
+				right: 10px;
+				width:40px;
+				height:40px;
+				/* border:1px solid red; */
+				background-color: #F0F0F0;
+			}
+			#btn-location img{
+				position: absolute;
+				left:50%;
+				top:50%;
+				transform: translate(-50%,-50%);
+			}
+		</style>
+		<!-- 字体相关 -->
+		<link rel="stylesheet" type="text/css" href="lib/css/iconfont.css" />
+		<!-- 弹出框样式 -->
+		<link rel="stylesheet" type="text/css" href="css/popup.css" />
+	</head>
+	<body onload="app.route()">
+		<div class="mui-content">
+			<!-- href="#popover-evidence" -->
+			<a id="btn-evidence" class="mui-btn map-btn" ><i class="iconfont icon-caozuo-moshi"></i>
+				<p>取证</p>
+			</a>
+			<!-- href="#popover-layers" -->
+			<a id="btn-layers" class="mui-btn map-btn" ><i class="iconfont icon-baobiao"></i>
+				<p>报表</p>
+			</a>
+			<a id="btn-review" class="mui-btn map-btn" href="#popover-review"><i class="iconfont icon-shangchuan"></i>
+				<p>上传</p>
+			</a>
+			<a id="btn-mine" class="mui-btn map-btn"><i class="iconfont icon-wode"></i>
+				<p>我的</p>
+			</a>
+			<a id="btn-layer" class="mui-btn map-btn"><i class="iconfont icon-tuceng"></i>
+				<p>图层</p>
+			</a>
+			
+			<a id="btn-location">
+				<img  style="width:60%;"  src="asset/images/dingwei.png" >
+			</a>
+			<div id="map" class="map"></div>
+			<div id="">
+				<img id="dituCenter" src="asset/images/ditu_center.png" />
+			</div>
+			<div id="popover-evidence" class="mui-popover mui-popover-action mui-popover-bottom">
+				<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+					<li id="li_outlet" class="mui-table-view-cell">
+						水源地取证
+					</li>
+					<li id="li_water" class="mui-table-view-cell">
+						污染源取证
+					</li>
+					<!-- <li id="li_water" class="mui-table-view-cell">
+						污染源取证
+					</li> -->
+				</ul>
+			</div>
+			<div id="popover-layers" class="mui-popover mui-popover-action mui-popover-bottom">
+				<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+					<li id="li_outlet_layers" class="mui-table-view-cell">
+						水源地报表
+					</li>
+				<!-- 	<li id="li_water_layers" class="mui-table-view-cell">
+						污染源报表
+					</li> -->
+				</ul>
+			</div>
+			<div id="popover-layer" class="mui-popover mui-popover-action mui-popover-bottom">
+				<ul class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+					<li class="mui-table-view-cell">
+						天地图矢量底图
+						<div id="switch_tiandi1" class="mui-switch mui-switch-blue mui-switch-mini mui-active">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</li>
+					<li class="mui-table-view-cell">
+						天地图矢量注记
+						<div id="switch_tiandi2" class="mui-switch mui-switch-blue mui-switch-mini mui-active">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</li>
+					<li class="mui-table-view-cell">
+						天地图遥感影像
+						<div id="switch_tiandi3" class="mui-switch mui-switch-blue mui-switch-mini mui-active">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</li>
+					<li class="mui-table-view-cell">
+						青浦遥感影像图
+						<div id="switch_qp1" class="mui-switch mui-switch-blue mui-switch-mini">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</li>
+					<li class="mui-table-view-cell mui-hidden">
+						宝山水系图
+						<div id="switch_qp2" class="mui-switch mui-switch-blue mui-switch-mini mui-active">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</li>
+					<li class="mui-table-view-cell mui-hidden">
+						2019年排口图
+						<div id="switch_qp3" class="mui-switch mui-switch-blue mui-switch-mini">
+							<div class="mui-switch-handle"></div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div id="popup" class="ol-popup">
+				<a href="#" id="popup-closer" class="ol-popup-closer"></a>
+				<div id="popup-content"></div>
+			</div>
+		</div>
+	</body>
+	<!-- 第三方 -->
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/ol.js"></script>
+	<script src="js/mui.js"></script>
+	<script src="https://webapi.amap.com/maps?v=1.4.15&key=366357a89ebbb8019eb0d86d19b3bacb"></script>
+	<script src="js/LonLatUtil.js"></script>
+	<!-- 自有 -->
+	<script src="js/app.js"></script>
+	<script src="js/index/mapService.js"></script>
+	<script src="js/base/versionService.js"></script>
+	<script src="js/base/backService.js"></script>
+	<script src="js/index/dictService.js"></script>
+	<script src="js/index/uploadService.js"></script>
+	<script src="js/index/inspectWaterQualityInfoService.js"></script>
+	<script src="js/index/inspectOutfalReportInfoService.js"></script>
+	<!-- 主程序 -->
+	<script type="text/javascript" charset="utf-8">
+		var startAndEndTime = {};
+		//上传相关用
+		var uploadInterval = null; //上传定时器
+		//地图对象
+		var switchTiandi1 = null;
+		var switchTiandi2 = null;
+		var switchTiandi3 = null;
+		var switchQp1 = null;
+		var switchQp2 = null;
+		var switchQp3 = null;
+		var dituCenter = null;
+		var geocoderResult = null; //跳转到取证页面传的值，每一次传值后要设置为null
+
+		var btnEvidence = null;
+		var liOutlet = null;
+		var liWater = null;
+		var liOutletLayers = null;
+		var liWaterLayers = null;
+		var btnLayers = null;
+		var btnReview = null;
+
+		var btnMine = null;
+		var btnLayer = null;
+		var new_data=null;
+		var btn_location=null;
+
+		$(document).ready(function() {
+			mui.init();
+			mui.plusReady(function() {
+				//检查版本
+				checkVersion();
+				//初始化视图
+				initView();
+				//初始化监听器
+				initListener();
+				//初始化地图
+				mapService.initMap(dituCenter, this.getGeoResultInfo);
+				mapService.initLayerShowHide(switchTiandi1, switchTiandi2, switchTiandi3, switchQp1, switchQp2, switchQp3);
+				//初始化一些网络请求
+				initNetworkData();
+				//退出按钮监听
+				initQuit();
+			})
+		});
+
+		function initView() {
+			btnLocation=$("#btn-location")
+			btnEvidence = $("#btn-evidence");
+			liOutlet = $("#li_outlet");
+			liWater = $("#li_water");
+			liOutletLayers = $("#li_outlet_layers");
+			liWaterLayers = $("#li_water_layers");
+			btnLayers = $("#btn-layers");
+			btnReview = $("#btn-review");
+			btnMine = $("#btn-mine");
+			btnLayer = $("#btn-layer");
+			switchTiandi1 = $("#switch_tiandi1");
+			switchTiandi2 = $("#switch_tiandi2");
+			switchTiandi3 = $("#switch_tiandi3");
+			switchQp1 = $("#switch_qp1");
+			switchQp2 = $("#switch_qp2");
+			switchQp3 = $("#switch_qp3");
+			dituCenter = $("#dituCenter");
+
+		}
+
+		function initListener() {
+			/**
+			 * 监听上一个页面fire返回【上传】
+			 * @param {Object} e
+			 */
+			window.addEventListener('reloadWebview', function(e) {
+				// console.log("---》刷新图层数据！")
+				// var currentWebview = plus.webview.currentWebview();
+				// currentWebview.reload(true); //设置页面重新加载项(默认为false，改为true)
+				mapService.initVectorLayer();
+			});
+			
+			//开启地图移动监听
+			window.addEventListener('openMapMoveendListener', function(e) {
+				console.log("--->openMapMoveendListener");
+				mapService.mapMoveListener(this.getGeoResultInfo);
+			});
+			
+			//这是定位  
+			btnLocation.click(function(){
+				// console.log('4444')
+				mapService.nativeLocation();
+			})
+			// window.addEventListener('openMapMoveendListener', function(e) {
+			// 	console.log("--->openMapMoveendListener");
+			// 	mapService.mapMoveListener(this.getGeoResultInfo);
+			// });
+
+			//"取证"按钮监听
+			// btnEvidence.click(function() {
+				// app.open("save.html");
+				// mui('#popover-evidence').popover('show');
+			// });
+
+			//“水源地取证”监听
+			btnEvidence.click(function() {
+				// app.open("save.html", JSON.stringify(geocoderResult));
+				// mui('#popover-evidence').popover('hide');
+				// geocoderResult = null;
+				
+				
+				if (geocoderResult != null) {
+					if (geocoderResult.riverNameList.length>0) {
+						app.open("save.html", JSON.stringify(geocoderResult));
+						mui('#popover-evidence').popover('hide');
+						geocoderResult = null;
+						
+						//关闭地图移动监听
+						mapService.closeMapMoveListener();
+					} else {
+						mui.toast("所选区域无图号！");
+					}
+				} else {
+					mui.toast("请移动地图选取点位！");
+				}
+			})
+
+		
+			//"排口报表"监听
+			btnLayers.click(function() {
+				
+				
+				
+				
+				
+				app.open("mine.html");
+				mui('#popover-layers').popover('hide');
+			})
+
+			//"水质报表"监听
+			liWaterLayers.click(function() {
+				app.open("waterMine.html");
+				mui('#popover-layers').popover('hide');
+			})
+
+			//"上传"按钮监听
+			btnReview.click(function() {
+				app.open("uploadData.html");
+			});
+
+			//"我的"按钮监听
+			btnMine.click(function() {
+				app.open("system.html");
+			})
+
+			//"图层"按钮监听
+			btnLayer.click(function() {
+				mui('#popover-layer').popover('show');
+			})
+		}
+
+		function getGeoResultInfo(geocoderResult) {
+			console.log("详细的地理位置信息--->" + JSON.stringify(geocoderResult));
+			this.geocoderResult = geocoderResult;
+			// getFigureNumberList
+			var promise = inspectOutfalReportInfoService.getRiverNameList('getFigureNumberList', geocoderResult);
+			// var promise = inspectOutfalReportInfoService.getRiverNameList('getRiverNameList', geocoderResult);
+			promise.then(function(ret) {
+				var data = ret.data;
+				console.log("data获取的图号>>>>>>>>>>--->"+JSON.stringify(ret))
+				var pic_data = JSON.stringify(data);
+				app.setSetting("new_data",pic_data );
+				 geocoderResult.riverNameList = data;
+			}, function(ret) {
+				mui.toast(ret.msg);
+			});
+		}
+
+		/**
+		 * 查询字典表、河道取证信息
+		 */
+		function initNetworkData() {
+			//查询字典表信息
+			getDictInfo();
+
+			//启动定时上传任务
+			initUploadService();
+
+			//获取河道取证信息
+			getInspectWaterQualityInfo();
+		}
+		// 
+		function getInspectWaterQualityInfo() {
+			var promise = inspectWaterQualityInfoService.getInspectWaterQualityInfo();
+			promise.then(function(ret) {
+				var data = ret.data.items;
+				var waterEvidenceData = JSON.stringify(ret.data.items);
+				app.setSetting("waterEvidenceData", waterEvidenceData); 
+				// console.log(JSON.stringify(waterEvidenceData));
+			}, function(ret) {
+				mui.toast(ret.msg);
+			});
+		}
+
+		function getDictInfo() {
+			var promise = dictService.getDictInfo();
+			promise.then(function(ret) {
+				var data = ret.data;
+				// console.log('数据字典Index'+JSON.stringify(data));
+				var dictionary = data[0];
+				app.setSetting("dictionary", dictionary);
+
+				var dictionaryKey = data[1];
+				var dictionaryKeyReverse = data[2];
+				app.setSetting("dictionaryKey", dictionaryKey);
+				app.setSetting("dictionaryKeyReverse", dictionaryKeyReverse);
+			}, function(ret) {
+				//then方法接收的第二个函数就是容器中的reject函数
+				mui.toast(ret.msg);
+			});
+		}
+
+		function initUploadService() {
+			app.setSetting("intervalFlag", true);
+			uploadService.upload(uploadInterval, this.getUploadCode);
+		}
+
+		function getUploadCode(code) {
+			console.log("---》刷新图层数据！")
+			// currentWebview.reload(true); //设置页面重新加载项(默认为false，改为true)
+			mapService.initVectorLayer();
+		}
+
+		/**
+		 * 检测版本更新
+		 */
+		function checkVersion() {
+			versionService.checkVersion();
+		}
+
+		/**
+		 * 再按一次退出
+		 */
+		function initQuit() {
+			backService.indexBack(uploadInterval);
+		}
+	</script>
+</html>

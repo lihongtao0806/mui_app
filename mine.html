@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" type="text/css" />
+		<link href="css/iconfont.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">
+			.page_loader {
+				text-align: center;
+				color: gray;
+				border-top: 1px solid #ccc;
+				padding-top: 5px;
+			}
+		</style>
+	</head>
+
+	<body onload="app.route()">
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">水源地取证信息</h1>
+		</header>
+		<div class="mui-content">
+			<ul class="mui-table-view" id="evidenceData">
+				<!-- <li class="mui-table-view-cell" id="1" imgUrl="abcd">
+					<p>地点：上海市宝山区杨行镇富长路</p>
+					<p>问题：有堵塞物体有堵塞物体有堵塞物体有堵塞物体有堵塞物体有堵塞物体</p>
+					<button class="mui-btn mui-btn-primary">a</button>
+				</li>
+				<li class="mui-table-view-cell" id="2" imgUrl="abcdabcdabcd">
+					<p>地点：上海市宝山区杨行镇富长路</p>
+					<p>问题：有堵塞物体</p>
+					<button class="mui-btn mui-btn-primary">a</button>
+				</li> -->
+			</ul>
+		</div>
+		<!-- <div id="page_loading" class="page_loader">
+			<img src="asset/images/loading.gif"> 加载中...
+		</div> -->
+		<div id="page_ended" class="page_loader">
+			列表已到最后
+		</div>
+	</body>
+
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/mui.js"></script>
+	<script src="js/app.js"></script>
+	<script type="text/javascript">
+		var evidenceData;
+		var reportSerialId;
+
+		$(document).ready(function() {
+			// $('#page_loading').show();
+			$('#page_ended').hide();
+			mui.init();
+			mui.plusReady(function() {
+				init();
+			})
+		});
+
+		function init() {
+			initData();
+			initView();
+			// initListener();
+		}
+
+		function initData() {
+			var userId = app.getSetting("user_id");
+			var params = {
+				userId: userId,
+				startTime: '',
+				endTime: '',
+				pageIndex: '',
+				pageSize: '',
+			}
+			app.ajax(app.url('/waterSource/getSimpleWaterPollutionReportInfo'), params, function(ret) {
+				console.log('参数' + JSON.stringify(params))
+				if (ret.code == 200) {
+					 evidenceData=ret.data&&ret.data.items;
+					 var html = "";
+					 console.log("上报展示信息--->" + JSON.stringify(evidenceData));
+					 
+					$('#page_ended').show();
+					for (value of evidenceData) {
+						var date = new Date(value.reportFoundtime);
+						var currentdate = app.getFormatDayTime(date);
+						html += '<li class="mui-table-view-cell"' + 'reportSerialId=' + value.reportSerialId + '>';
+						html+=	'<a class="link_open mui-navigate-right" href="mine_Passes_detail.html?reportSerialId=' + value.reportSerialId + '">' ;
+						html += '<p>时间：' + currentdate + '</p>';
+						html += '<p>地点：' + value.reportPlaceDescribe + '</p>';
+						html += '<p>问题：' + value.problemDescribe + '</p>';
+						html+='</a>' ;
+						html += '</li>';
+					}
+					$("#evidenceData").html(html);
+				} else {
+					mui.toast(ret.msg);
+				}
+			});
+		}
+		function initView() {
+
+		}
+
+		function initListener() {
+			mui(".mui-table-view").on('tap', '.mui-table-view-cell', function() {
+				//获取id
+				var reportSerialId = this.getAttribute("reportSerialId");
+				// console.log("reportSerialId=" + reportSerialId);
+				app.open("mine_detail.html?reportSerialId=" + reportSerialId);
+			});
+
+			// 监听上一个页面fire返回
+			window.addEventListener('reloadMineWebview', function(e) {
+				var html = "";
+				var reportSerialId = e.detail.reloadMineWebview.reportSerialId;
+
+				for (var i = 0; i < evidenceData.length; i++) {
+					if (evidenceData[i].reportSerialId == reportSerialId) {
+						evidenceData.splice(i, 1);
+						i--;
+					} else {
+						var date = new Date(evidenceData[i].reportFoundtime);
+						var currentdate = app.getFormatDayTime(date);
+
+						html += '<li class="mui-table-view-cell"' + 'reportSerialId=' + evidenceData[i].reportSerialId + '>';
+						html += '<p>时间：' + currentdate + '</p>';
+						html += '<p>地点：' + evidenceData[i].reportPlaceDescribe + '</p>';
+						html += '<p>问题：' + evidenceData[i].problemDescribe + '</p>';
+						html += '</li>';
+					}
+				}
+				$("#evidenceData").html(html);
+			});
+
+			//重置上一个页面
+			var old_back = mui.back;
+			mui.back = function() {
+				//上一个界面刷新；
+				var self = plus.webview.currentWebview();
+				var opener = self.opener();
+				mui.fire(opener, 'reloadWebview', {
+					"reloadWebview": {}
+				});
+				//继续当前页面原有返回逻辑  
+				old_back();
+			}
+		}
+	</script>
+
+</html>

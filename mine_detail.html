@@ -1,0 +1,456 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" type="text/css" />
+		<link href="css/iconfont.css" rel="stylesheet" type="text/css" />
+		<link href="./css/mui.picker.min.css" rel="stylesheet" />
+		<link href="./css/mui.poppicker.css" rel="stylesheet" />
+		<style>
+			#list-option .mui-table-view-cell button{
+				position: relative;
+				right: inherit;
+				-webkit-transform: inherit;
+				transform: inherit;
+			}
+			
+			.mui-table-view span.mui-pull-right {
+			    color: #999;
+			}
+			
+			.img-selected {
+				width:80px;
+				height:80px;
+				margin-top: 10px;
+			}
+			
+			.img-water-selected {
+				width:80px;
+				height:80px;
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+	<body onload="app.route()">
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a id="btnSubmit" class="mui-btn mui-btn-link mui-pull-right btn_submit mui-hidden">上传</a>
+			<a id="btnSave" class="mui-btn mui-btn-link mui-pull-right btn_save">保存</a>
+			<h1 class="mui-title">水源地取证详情</h1>
+		</header>
+		<div class="mui-content">
+			<ul id="list-option" class="mui-table-view" style="padding-bottom: 50px;">
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-icon-test"></i> 图号
+					<span style="color:red">*</span>
+					<span id="figure" style="max-width: 100%;text-align: right;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-yiliaohangyedeICON-"></i> 经纬度
+					<span style="color:red">*</span>
+					<span id="btnLocation" style="max-width: 100%;text-align: right;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-quyuguanli"></i> 区域类型
+					<span style="color:red">*</span>
+					<span id="select6" style="max-width: 100%;" class="mui-pull-right mui-ellipsis">请选择...</span>
+				</li>
+
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-beizhu">实体名称</i>
+					<span style="color:red">*</span>
+					<textarea id="select10" rows="3" placeholder="请输入备注"></textarea>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-xiangzhenshuiliguanlidanwei"></i> 所在镇
+					<!-- <span style="color:red">*</span> -->
+					<span id="select2" style="max-width: 100%;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-miaoshu">位置描述</i>
+					<textarea disabled="disabled" id="select9" rows="3" placeholder="请输入位置的精确描述信息"></textarea>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-miaoshu">问题描述</i>
+					<textarea id="select99" rows="3" placeholder="请输入位置的精确描述信息"></textarea>
+				</li>
+				<li class="mui-table-view-cell mui-hidden">
+					<i class="iconfont icon-caozuo-moshi"></i> 风险源类别
+					<span style="color:red">*</span>
+					<span id="select4" style="max-width: 100%;" class="mui-pull-right mui-ellipsis">请选择...</span>
+				</li>
+				<li class="mui-table-view-cell mui-hidden">
+					<i class="iconfont icon-shijian"></i> 巡查时间
+					<span style="color:red">*</span>
+					<span id='selectDate' data-options='{"type":"datetime"}' style="max-width: 100%;" class="mui-pull-right mui-ellipsis">请选择...</span>
+				</li>
+				<li class="mui-table-view-cell">
+					<p style="color: #000000;font-weight: bolder;"><span style="color:red">*</span>取证图片 (最多<span id="max_photos">2</span>张)(长按显示操作菜单)
+						<button id="addImgBtn" class="mui-btn mui-btn-primary mui-btn-outlined mui-pull-right">
+							<i class="iconfont icon-jia"></i>
+						</button>
+					</p>
+					<div id="imgList">
+
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div id="picture" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a onclick="getImage()">拍照</a>
+				</li>
+				<li class="mui-table-view-cell">
+					<a onclick="galleryImgsMaximum()">选取现有的</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#picture"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+		<div id="img_action_list" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a onclick="delImg()">删除</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#img_action_list"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+		<div id="img_action_list" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a onclick="delImg()">删除</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#img_action_list"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+	</body>
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/mui.js"></script>
+	<script src="js/mui.picker.min.js"></script>
+	<script src="js/mui.poppicker.js"></script>
+	<script src="js/app.js"></script>
+	<script src="js/base/backService.js"></script>
+	<script type="text/javascript">
+		//本地模拟Json数据
+		var dataJson;
+		var dictionary;
+		var uploadData = {};
+		var uploadDataIndex = 0;
+		var file_data_arr = []; //待上传图片数组
+		var imageFlag = true; //true:取证  false:水质监测
+		//"保存"按钮
+		var btnSave
+		//"提交"按钮
+		var btnSubmit;
+		//"定位"按钮
+		var btnLocation;
+		var btnLocationData = {};
+		//"片区"按钮
+		var select2;
+		var select2Data;
+		//"排污类别"按钮
+		var select4;
+		var select4Data;
+		//"排放方式"按钮
+		var select6;
+		var select6Data;
+		//"发现时间"按钮
+		var selectDate;
+		var selectDateData;
+		//位置描述
+		var select8;
+		var select8Data;
+		var select9;
+		var select99;
+		var select9Data;
+		//"排口状况描述"按钮
+		var select10;
+		var select10Data;
+		//占地面积
+		// var select_area;
+		// var select_areaData;
+		// 图号
+		var figure;
+		var figureData;
+		//"图片列表 取证"显示控件
+		var imgList;
+		//"图片列表 水质监测"显示控件
+		//"新增图片 取证"按钮
+		var addImgBtn;
+		//"图片列表 取证"操作对象
+		var currentImgItem = null;
+		//"新增图片 水质监测"按钮
+		// var addWaterImgBtn;
+		//"图片列表 水质监测"操作对象
+		// var currentWaterImgItem = null;
+		$(document).ready(function() {
+			mui.init({
+				gestureConfig: {
+					longtap: true, //默认为false
+				}
+			})
+			mui.plusReady(function() {
+				init();
+			})
+		});
+		function init() {
+			initView();
+			initEvidence();
+			initListener()
+		}
+		// 时间封装
+		function getNowTime(type, newDate) {
+			var date = newDate ? new Date('' + newDate) : new Date();
+			var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+			var strDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+			if (type == 'now') {
+				var hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+				var min = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+				var sec = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
+				var currentdate = date.getFullYear() + '-' + month + '-' + strDate + ' ' + hours + ':' + min + ':' + sec;
+			}
+			return currentdate;
+		}
+		function initView() {
+			// select_area = $("#select_area")
+			btnSave = $("#btnSave");
+			btnSubmit = $("#btnSubmit");
+			// btnDelete = $("#btnDelete");
+			btnLocation = $("#btnLocation");
+			//给"定位"按钮设置样式,防止经纬度过长显示跳行的问题
+			btnLocation.css({
+				"width": "70%"
+			});
+			select2 = $("#select2");
+			select4 = $("#select4");
+			select6 = $("#select6");
+			selectDate = $("#selectDate");
+			select8 = $("#select8");
+			select9 = $("#select9");
+			select99 = $("#select99");
+			select10 = $("#select10");
+			figure = $("#figure"); //图号
+			imgList = document.getElementById('imgList');
+			addImgBtn = document.getElementById('addImgBtn')
+		}
+		//"提交"按钮监听
+		//"保存"按钮监听
+		function initListener() {
+			//"提交"按钮监听
+			btnSubmit.click(function() {
+				submit();
+			});
+			//"保存"按钮监听
+			btnSave.click(function() {
+				saveUploadData();
+			});
+			//"定位"按钮监听
+			btnLocation.click(function() {
+				// getLocation();
+			})
+			//"区域类型"按钮
+			select6.click(function() {
+				var dischargeType = JSON.parse(app.getSetting("dictionary")).area_type;
+				var select6Picker = new mui.PopPicker();
+				select6Picker.setData(dischargeType);
+
+				select6Picker.show(function(items) {
+					select6Data = items[0];
+					select6.html(select6Data);
+					uploadData.areaType = select6Data;
+
+				});
+			});
+			//"巡查时间"按钮
+			uploadData.reportFoundTime = getNowTime('now');
+			// 问题描述select99
+			select99.bind('input propertychange', function() {
+				uploadData.problemDescribe = select99.val();
+			});
+			select10.bind('input propertychange', function() {
+				select10Data = select10.val();
+				uploadData.remark = select10Data;
+			});
+			var remark = app.getUrlParam('remark');
+			select10.html(select10Data ? select10Data : remark)
+			uploadData.remark = select10Data ? select10Data : remark;
+			//"图片列表 取证"按钮
+			addImgBtn.addEventListener('tap', function() {
+				imageFlag = true;
+				if (document.querySelectorAll('.img-selected').length >= app.max_count_photos) {
+					mui.toast('取证照片已至最大数量');
+					return;
+				}
+				mui('#picture').popover('toggle');
+			})
+			//重置上一个页面
+			backService.saveBack();
+		}
+		function getImage() {
+			var cmr = plus.camera.getCamera();
+			cmr.captureImage(function(path) {
+				addImg(path);
+				plus.gallery.save(path, function(event) {}, function(e) {});
+			}, function(e) {}, {
+				filename: '_doc/gallery/',
+				index: 1
+			});
+			mui('#picture').popover('toggle');
+		}
+		function galleryImgsMaximum() {
+			var maxValue = null;
+			if (imageFlag) {
+				maxValue = app.max_count_photos - document.querySelectorAll('.img-selected').length - 1;
+			} else {
+				maxValue = app.max_count_photos - document.querySelectorAll('.img-water-selected').length - 1;
+			}
+			if (maxValue < 0)
+				maxValue = 0;
+			if (maxValue == 0) {
+				alert('取证图片已选至最大数量');
+				mui('#picture').popover('toggle');
+				return;
+			}
+			// 从相册中选择图片
+			plus.gallery.pick(function(e) {
+				for (var i in e.files) {
+					addImg(e.files[i]);
+				}
+			}, function(e) {}, {
+				filter: 'image',
+				multiple: true,
+				maximum: maxValue,
+				system: false,
+				onmaxed: function() {
+					plus.nativeUI.alert('最多只能选择' + maxValue + '张图片');
+				}
+			}); // 最多选择3张图片
+			mui('#picture').popover('toggle');
+		}
+		function isEmpty(obj) {
+			var regu = "^[ ]+$";
+			var re = new RegExp(regu);
+			if (typeof obj == "undefined" || obj == null || obj == "" || re.test(obj)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		function addImg(strSrc) {
+			plus.io.resolveLocalFileSystemURL(strSrc, function(entry) {
+				strSrc = entry.fullPath;
+				entry.getMetadata(function(metadata) {
+					// console.log("图片大小--->" + metadata.size / 1024 / 1024 + "M");
+					var newImg = document.createElement('img');
+					console.log(strSrc)
+					newImg.src = strSrc;
+					newImg.addEventListener('longtap', function() {
+						currentImgItem = this;
+						mui('#img_action_list').popover('toggle');
+					})
+					if (imageFlag) {
+						newImg.classList.add("img-selected");
+						imgList.appendChild(newImg);
+					} else {
+						newImg.classList.add("img-water-selected");
+					}
+				}, function(err) {
+					mui.toast('打开文件错误');
+				})
+			});
+		}
+		function delImg() {
+			if (currentImgItem) {
+				currentImgItem.parentNode.removeChild(currentImgItem);
+				currentImgItem = null;
+			}
+			mui('#img_action_list').popover('toggle');
+		}
+		/**
+		 * 保存
+		 * 1 验证页面条件是否输入完整
+		 * 2 将待上传数据保存到本地中，等待上传
+		 */
+		function saveUploadData() {
+			if (!app.checkLegality(uploadData.serialNum)) {
+				mui.toast("请先选择图号！");
+				return;
+			}
+			if (!app.checkLegality(uploadData.lat)) {
+				mui.toast("请先定位！");
+				return;
+			}
+			if (!app.checkLegality(uploadData.areaType)) {
+				mui.toast("区域类型 不能为空！");
+				return;
+			}
+			if (isEmpty(select10.val())) {
+				mui.toast("实体名称 不能为空！");
+				return;
+			}
+			// 图片
+			var arrImgs = [];
+			$(".img-selected").each(function(key, value) {
+				arrImgs.push($(value).attr('src'));
+			})
+			uploadData.images = arrImgs;
+			if (!app.checkLegality(uploadData.images)) {
+				mui.toast("图片 不能为空！");
+				return;
+			}
+			//发现时间
+			uploadData.reportFoundTime = app.getFormatDayTime();
+			// console.log('保存本地的值'+JSON.stringify(uploadData))
+			// 保存本地
+			var uploadDatas = JSON.parse(app.getSetting("uploadDatas"));
+			// console.log('每次添加'+JSON.stringify(uploadDatas))
+			if (uploadDatas.data == null) {
+				uploadDatas.data = [];
+			}
+			uploadDatas.data.push(uploadData);
+			app.setSetting("uploadDatas", JSON.stringify(uploadDatas));
+			mui.back();
+		}
+		function initEvidence() {
+			// 图号
+			var serialNum = app.getUrlParam('serialNum');
+			figure.html(serialNum);
+			uploadData.serialNum = serialNum;
+			// 经度
+			var lon = app.getUrlParam('lon');
+			uploadData.lon = lon;
+			// 维度
+			var lat = app.getUrlParam('lat');
+			uploadData.lat = lat;
+			console.log('经纬度' + lon)
+			btnLocation.html(lon + "," + lat)
+			// 所在镇
+			var town = app.getUrlParam('town');
+			select2.html(town);
+			uploadData.town = town;
+			// 类型 reportType
+			uploadData.reportType = '1704';
+			// 位置描述
+			var locationDescription = app.getUrlParam('locationDescription');
+			select9.html(locationDescription);
+			uploadData.reportPlaceDescribe = locationDescription;
+
+		}
+	</script>
+
+</html>

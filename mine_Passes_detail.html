@@ -1,0 +1,363 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" type="text/css" />
+		<link href="css/iconfont.css" rel="stylesheet" type="text/css" />
+		<link href="./css/mui.picker.min.css" rel="stylesheet" />
+		<link href="./css/mui.poppicker.css" rel="stylesheet" />
+		<style>
+			#list-option .mui-table-view-cell button{
+				position: relative;
+				right: inherit;
+				-webkit-transform: inherit;
+				transform: inherit;
+			}
+			
+			.mui-table-view span.mui-pull-right {
+			    color: #999;
+			}
+			
+			.img-selected {
+				width:80px;
+				height:80px;
+				margin-top: 10px;
+			}
+			
+			.img-water-selected {
+				width:80px;
+				height:80px;
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+
+	<body onload="app.route()">
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a id="btnDelete" class="mui-btn mui-btn-link mui-pull-right btnDelete mui-hidden">删除</a>
+			<h1 class="mui-title">水源地取证详情</h1>
+		</header>
+
+		<div class="mui-content">
+			<ul id="list-option" class="mui-table-view" style="padding-bottom: 50px;">
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-icon-test"></i> 图号
+					
+					<span id="figure" style="max-width: 100%;text-align: right;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-yiliaohangyedeICON-"></i> 经纬度
+					
+					<span id="btnLocation" style="max-width: 100%;text-align: right;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-xiangzhenshuiliguanlidanwei"></i> 所在镇
+					
+					<span id="select2" style="max-width: 100%;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-miaoshu">位置描述</i>
+					<textarea  disabled="disabled" id="select9" rows="3" placeholder="请输入位置的精确描述信息"></textarea>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-mianji">占地面积</i>
+					<span id="select_area" style="max-width: 100%;text-align: right;" class="mui-pull-right mui-ellipsis"></span>
+					
+				</li>
+
+				<li class="mui-table-view-cell mui-hidden">
+					<i class="iconfont icon-caozuo-moshi"></i> 风险源类别
+					<!-- <span style="color:red">*</span> -->
+					<span id="select4" style="max-width: 100%;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+
+
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-quyuguanli"></i> 区域类型
+				<!-- 	<span style="color:red">*</span> -->
+					<span id="select6" style="max-width: 100%;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-shijian"></i> 巡查时间
+					<!-- <span style="color:red">*</span> -->
+					<span id='selectDate' data-options='{"type":"datetime"}' style="max-width: 100%;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-beizhu">实体名称</i>
+
+					<textarea id="select10"   disabled="disabled" rows="3" placeholder="请输入备注"></textarea>
+				</li>
+				<li class="mui-table-view-cell">
+					<p style="color: #000000;font-weight: bolder; display:none;">取证图片 (最多<span id="max_photos">2</span>张)(长按显示操作菜单)
+						<button id="addImgBtn" class="mui-btn mui-btn-primary mui-btn-outlined mui-pull-right">
+							<i class="iconfont icon-jia"></i>
+						</button>
+					</p>
+					<p  style="color: #000000;font-weight: bolder;">
+						取证图片
+					</p>
+					<div id="imgList">
+
+					</div>
+				</li>
+
+			</ul>
+		</div>
+
+		<div id="picture" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a onclick="getImage()">拍照</a>
+				</li>
+				<li class="mui-table-view-cell">
+					<a onclick="galleryImgsMaximum()">选取现有的</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#picture"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+
+		<div id="img_action_list" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a onclick="delImg()">删除</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#img_action_list"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+
+		<div id="img_action_list" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a onclick="delImg()">删除</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#img_action_list"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+	</body>
+
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/mui.js"></script>
+	<script src="js/mui.picker.min.js"></script>
+	<script src="js/mui.poppicker.js"></script>
+	<script src="js/app.js"></script>
+	<script type="text/javascript">
+		//本地模拟Json数据
+		var dataJson;
+		var dictionary;
+		var uploadData = {};
+		var uploadDataIndex = 0;
+		var file_data_arr = []; //待上传图片数组
+		var imageFlag = true; //true:取证  false:水质监测
+		//"保存"按钮
+		var btnSave
+		//"提交"按钮
+		var btnSubmit;
+		//"定位"按钮
+		var btnLocation;
+		var btnLocationData = {};
+
+		//"片区"按钮
+		var select2;
+		var select2Data;
+		//"排污类别"按钮
+		var select4;
+		var select4Data;
+		//"排放方式"按钮
+		var select6;
+		var select6Data;
+
+		//"发现时间"按钮 
+		var selectDate;
+		var selectDateData;
+		//位置描述
+		var select9;
+		var select9Data;
+		//"排口状况描述"按钮
+		var select10;
+		var select10Data;
+        //占地面积
+		var select_area;
+		var select_areaData;
+	    // 图号
+		var figure;
+		var figure_data;
+
+		//"图片列表 取证"显示控件
+		var imgList;
+		//"图片列表 水质监测"显示控件
+		var waterImgList;
+		//"新增图片 取证"按钮
+		var addImgBtn;
+		//"图片列表 取证"操作对象
+		var currentImgItem = null;
+		//"新增图片 水质监测"按钮
+		var addWaterImgBtn;
+		//"图片列表 水质监测"操作对象
+		var currentWaterImgItem = null;
+
+		$(document).ready(function() {
+			mui.init({
+				gestureConfig: {
+					longtap: true, //默认为false
+				}
+			})
+
+			mui.plusReady(function() {
+				init();
+			})
+		});
+
+		function init() {
+			initView();
+			initData();
+			initListener();
+		}
+	
+		function initView() {
+			select_area=$("#select_area")
+			btnSave = $("#btnSave");
+			btnSubmit = $("#btnSubmit");
+			// btnDelete = $("#btnDelete");
+			btnLocation = $("#btnLocation");
+			//给"定位"按钮设置样式,防止经纬度过长显示跳行的问题
+			btnLocation.css({
+				"width": "70%"
+			});
+			select2 = $("#select2");
+			select4 = $("#select4");
+			select6 = $("#select6");
+			selectDate = $("#selectDate");
+			
+			select9=$("#select9");
+			select10 = $("#select10");
+			figure=$("#figure") ;  //图号
+			figure.css({
+				"width": "50%"
+			})
+			imgList = document.getElementById('imgList');
+			waterImgList = document.getElementById('waterImgList');
+			addImgBtn = $("#addImgBtn");
+			addWaterImgBtn = $("#addWaterImgBtn");
+		}
+		function initData() {
+			var reportSerialId = app.getUrlParam('reportSerialId');
+			console.log("前一页面传递过来的值--->" + reportSerialId);
+			//根据reportSerialId，请求获取图片等单子数据
+			app.ajax(app.url('/waterSource/selectWaterPollutionByReportSerialId'), {
+				"reportSerialId": reportSerialId
+			}, function(ret) {
+					console.log("取证展示信息--->》》》》》》》》》》》》" + JSON.stringify(ret.data[0]));
+				if (ret.code == 200) {
+				
+					initEvidence(ret.data[0]);
+				} else {
+					mui.toast(ret.msg);
+				}
+			});
+		}
+		function initListener() {
+			//删除该条记录
+			btnDelete.click(function() {
+				var reportSerialId = app.getUrlParam('reportSerialId');
+				app.ajax(app.url('modifyFlagDeleteByReportSerialId'), {
+					"reportSerialId": reportSerialId,
+					"userId": app.getSetting("user_id")
+				}, function(ret) {
+					console.log("删除数据后返回：" + JSON.stringify(ret));
+					if (ret.code == 200) {
+						mui.toast(ret.msg);
+						//重置上一个页面
+						var self = plus.webview.currentWebview();
+						var opener = self.opener();
+						mui.fire(opener, 'reloadMineWebview', {
+							"reloadMineWebview": {
+							"reportSerialId": reportSerialId
+							}
+						});
+						mui.fire(opener, 'reloadWebview', {
+							"reloadWebview": {}
+						});
+						mui.back();
+					} else {
+						mui.toast(ret.msg);
+					}
+				});
+			});
+			//"提交"按钮监听
+			//"保存"按钮监听
+			btnSave.click(function() {
+				saveUploadData();
+			});
+			//"图片列表 取证"按钮
+			addImgBtn.click(function() {
+				imageFlag = true;
+				if (document.querySelectorAll('.img-selected').length >= app.max_count_photos) {
+					mui.toast('取证照片已至最大数量');
+					return;
+				}
+				mui('#picture').popover('toggle');
+			});
+				
+		
+		}
+		function getImage() {
+			var cmr = plus.camera.getCamera();
+			cmr.captureImage(function(path) {
+				addImg(path);
+		
+				plus.gallery.save(path, function(event) {}, function(e) {});
+			}, function(e) {}, {
+				filename: '_doc/gallery/',
+				index: 1
+			});
+		
+			mui('#picture').popover('toggle');
+		}
+	
+		function initEvidence(evidence) {
+			console.log('evidence'+JSON.stringify(evidence))
+			//定位赋值
+			btnLocation.html(evidence.lon + "," + evidence.lat); //经纬度
+			select2.html(evidence.town); //所在镇
+			var dictionaryKeyReverse = JSON.parse(app.getSetting("dictionaryKeyReverse"));
+			select4.html(dictionaryKeyReverse[evidence.riskSourcesType]); //风险源类型
+			figure.html(evidence.serialNum)
+			// 
+			select6.html(dictionaryKeyReverse[evidence.areaType]); //区域类型
+			selectDate.html((new Date(evidence.foundTime)).format("yyyy-MM-dd hh:mm:ss")); //巡查时间
+			// (new Date(evidence.foundTime)).format("yyyy-MM-dd hh:mm:ss")
+			select9.html(evidence.locationDescription); //位置描述
+			select10.html(evidence.remark);
+			// 占地面积
+			select_area.html(evidence.measureArea)
+			//图片赋值
+			var arrImgs = evidence.images;
+			// var arrWaterImgs = evidence.arrWaterImgs;
+			for (var i = 0; i < arrImgs.length; i++) {
+				var newImg = document.createElement('img');
+				newImg.src = app.getUrl() + "images/thumb/" + arrImgs[i];
+				newImg.classList.add("img-selected");
+				imgList.appendChild(newImg);
+			}
+		}
+	</script>
+
+</html>

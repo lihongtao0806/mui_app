@@ -1,0 +1,228 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" type="text/css" />
+		<link href="css/iconfont.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">
+			.label-p {
+				display: flex;
+				flex: 1;
+				/* background-color: green; */
+				line-height: 33px;
+				padding: 0;
+				margin: 0px 0px 0px 60px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.div-input {
+				line-height: 100px;
+			}
+
+			.mui-content .mui-input-group label {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: left;
+				/* background-color: red; */
+				padding: 0;
+				margin: 0;
+			}
+		</style>
+	</head>
+
+	<body onload="app.route()">
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a id="btnSelectAll" class="mui-btn mui-btn-link mui-pull-left" style="margin-left: 8px;">全选</a>
+			<a id="btnCancelSelectAll" class="mui-btn mui-btn-link mui-pull-left" style="">取消</a>
+			<a id="btnUpload" class="mui-btn mui-btn-link mui-pull-right" style="">上传</a>
+			<a id="btnDelete" class="mui-btn mui-btn-link mui-pull-right " style="">删除</a>
+			<h1 class="mui-title">取证上传</h1>
+		</header>
+		<div class="mui-content">
+			<form class="mui-input-group">
+				<!-- <div class="mui-left mui-input-row mui-checkbox" style="height: 100px;">
+					<label>
+						<p class="label-p">位置：XXX</p>
+						<p class="label-p">时间：XXX</p>
+						<p class="label-p">报告人：XXX</p>
+					</label>
+					<input class="div-input left_checkbox" name="subcheck" type="checkbox">
+				</div> -->
+			</form>
+		</div>
+	</body>
+
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/mui.js"></script>
+	<script src="js/app.js"></script>
+	<script type="text/javascript">
+		var uploadDatas; //所有待上传的数据
+		var uploadDataArr = []; //待上传的数据在所有数组中的下标
+		var uploadIndexArr = []; //待上传的数据在界面列表数组中的下标
+		var btnSelectAll = null; //"全选"按钮
+		var btnCancelSelectAll = null; //"取消"按钮
+		var btnUpload = null; //"上传"按钮
+		var btnDelete = null; //"删除"按钮
+
+		$(document).ready(function() {
+			mui.init();
+			mui.plusReady(function() {
+				initList();
+				initView();
+				initListener();
+			})
+		});
+
+		function initList() {
+			var userName = app.getSetting("user_name");
+
+			// var tmpUploadDatas = [
+			// 	{"streetTownViliage":"月浦镇1","lnglat":[121.40429210781214,31.413948792749977],"lon":121.40429210781214,"lat":31.413948792749977,"address":"上海市宝山区月浦镇园和路256号","riverNameList":["马路河","杨盛河","宝钢护厂河","练祁河"],"riverNameAndLevel":[{"riverLevel":"区管","riverCode":"BS53","riverName":"马路河"},{"riverLevel":"区管","riverCode":"BS50","riverName":"杨盛河"},{"riverLevel":"区管","riverCode":"BS52","riverName":"宝钢护厂河"},{"riverLevel":"市管","riverCode":"BS37","riverName":"练祁河"}],"riverName":"马路河","riverLevel":"区管","riverCode":"BS53","outleteDirection":"东","flagOutlet":"是","entryRiverType":"明管","outletName":"雨水口","dischargeType":"间歇","dischargeSubtype":"无水","dischargeTypeDescribe":"其他","outfallArroundType":"居民区","sewageSourceType":"污水处理厂","suYuan":"是","pipelineCaliber":"123","setunit":"123","problemDescribe":"123","codValue":"0-30","nh3Value":"0-0.2","tpValue":"0.5-1","phValue":"123","electricValue":null,"doValue":null,"nh4Value":null,"arrImgs":["/storage/emulated/0/DCIM/Camera/1588056993447_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056966859_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056924771_s50.jpg"],"arrWaterImgs":["/storage/emulated/0/DCIM/Camera/1588056910006_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056993447.jpg","/storage/emulated/0/DCIM/Camera/1588056966859.jpg"],"selectDate":"2020-06-02 14:47:12","urlName":"saveEvidence","eventType":1,"toUpload":0},
+			// 	{"streetTownViliage":"月浦镇2","lnglat":[121.40429210781214,31.413948792749977],"lon":121.40429210781214,"lat":31.413948792749977,"address":"上海市宝山区月浦镇园和路256号","riverNameList":["马路河","杨盛河","宝钢护厂河","练祁河"],"riverNameAndLevel":[{"riverLevel":"区管","riverCode":"BS53","riverName":"马路河"},{"riverLevel":"区管","riverCode":"BS50","riverName":"杨盛河"},{"riverLevel":"区管","riverCode":"BS52","riverName":"宝钢护厂河"},{"riverLevel":"市管","riverCode":"BS37","riverName":"练祁河"}],"riverName":"马路河","riverLevel":"区管","riverCode":"BS53","outleteDirection":"东","flagOutlet":"是","entryRiverType":"明管","outletName":"雨水口","dischargeType":"间歇","dischargeSubtype":"无水","dischargeTypeDescribe":"其他","outfallArroundType":"居民区","sewageSourceType":"污水处理厂","suYuan":"是","pipelineCaliber":"123","setunit":"123","problemDescribe":"123","codValue":"0-30","nh3Value":"0-0.2","tpValue":"0.5-1","phValue":"123","electricValue":null,"doValue":null,"nh4Value":null,"arrImgs":["/storage/emulated/0/DCIM/Camera/1588056993447_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056966859_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056924771_s50.jpg"],"arrWaterImgs":["/storage/emulated/0/DCIM/Camera/1588056910006_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056993447.jpg","/storage/emulated/0/DCIM/Camera/1588056966859.jpg"],"selectDate":"2020-06-02 14:47:12","urlName":"saveEvidence","eventType":2,"toUpload":0},
+			// 	{"streetTownViliage":"月浦镇3","lnglat":[121.40429210781214,31.413948792749977],"lon":121.40429210781214,"lat":31.413948792749977,"address":"上海市宝山区月浦镇园和路256号","riverNameList":["马路河","杨盛河","宝钢护厂河","练祁河"],"riverNameAndLevel":[{"riverLevel":"区管","riverCode":"BS53","riverName":"马路河"},{"riverLevel":"区管","riverCode":"BS50","riverName":"杨盛河"},{"riverLevel":"区管","riverCode":"BS52","riverName":"宝钢护厂河"},{"riverLevel":"市管","riverCode":"BS37","riverName":"练祁河"}],"riverName":"马路河","riverLevel":"区管","riverCode":"BS53","outleteDirection":"东","flagOutlet":"是","entryRiverType":"明管","outletName":"雨水口","dischargeType":"间歇","dischargeSubtype":"无水","dischargeTypeDescribe":"其他","outfallArroundType":"居民区","sewageSourceType":"污水处理厂","suYuan":"是","pipelineCaliber":"123","setunit":"123","problemDescribe":"123","codValue":"0-30","nh3Value":"0-0.2","tpValue":"0.5-1","phValue":"123","electricValue":null,"doValue":null,"nh4Value":null,"arrImgs":["/storage/emulated/0/DCIM/Camera/1588056993447_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056966859_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056924771_s50.jpg"],"arrWaterImgs":["/storage/emulated/0/DCIM/Camera/1588056910006_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056993447.jpg","/storage/emulated/0/DCIM/Camera/1588056966859.jpg"],"selectDate":"2020-06-02 14:47:12","urlName":"saveEvidence","eventType":2,"toUpload":0},
+			// 	{"streetTownViliage":"月浦镇4","lnglat":[121.40429210781214,31.413948792749977],"lon":121.40429210781214,"lat":31.413948792749977,"address":"上海市宝山区月浦镇园和路256号","riverNameList":["马路河","杨盛河","宝钢护厂河","练祁河"],"riverNameAndLevel":[{"riverLevel":"区管","riverCode":"BS53","riverName":"马路河"},{"riverLevel":"区管","riverCode":"BS50","riverName":"杨盛河"},{"riverLevel":"区管","riverCode":"BS52","riverName":"宝钢护厂河"},{"riverLevel":"市管","riverCode":"BS37","riverName":"练祁河"}],"riverName":"马路河","riverLevel":"区管","riverCode":"BS53","outleteDirection":"东","flagOutlet":"是","entryRiverType":"明管","outletName":"雨水口","dischargeType":"间歇","dischargeSubtype":"无水","dischargeTypeDescribe":"其他","outfallArroundType":"居民区","sewageSourceType":"污水处理厂","suYuan":"是","pipelineCaliber":"123","setunit":"123","problemDescribe":"123","codValue":"0-30","nh3Value":"0-0.2","tpValue":"0.5-1","phValue":"123","electricValue":null,"doValue":null,"nh4Value":null,"arrImgs":["/storage/emulated/0/DCIM/Camera/1588056993447_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056966859_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056924771_s50.jpg"],"arrWaterImgs":["/storage/emulated/0/DCIM/Camera/1588056910006_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056993447.jpg","/storage/emulated/0/DCIM/Camera/1588056966859.jpg"],"selectDate":"2020-06-02 14:47:12","urlName":"saveEvidence","eventType":1,"toUpload":0},
+			// 	{"streetTownViliage":"月浦镇5","lnglat":[121.40429210781214,31.413948792749977],"lon":121.40429210781214,"lat":31.413948792749977,"address":"上海市宝山区月浦镇园和路256号","riverNameList":["马路河","杨盛河","宝钢护厂河","练祁河"],"riverNameAndLevel":[{"riverLevel":"区管","riverCode":"BS53","riverName":"马路河"},{"riverLevel":"区管","riverCode":"BS50","riverName":"杨盛河"},{"riverLevel":"区管","riverCode":"BS52","riverName":"宝钢护厂河"},{"riverLevel":"市管","riverCode":"BS37","riverName":"练祁河"}],"riverName":"马路河","riverLevel":"区管","riverCode":"BS53","outleteDirection":"东","flagOutlet":"是","entryRiverType":"明管","outletName":"雨水口","dischargeType":"间歇","dischargeSubtype":"无水","dischargeTypeDescribe":"其他","outfallArroundType":"居民区","sewageSourceType":"污水处理厂","suYuan":"是","pipelineCaliber":"123","setunit":"123","problemDescribe":"123","codValue":"0-30","nh3Value":"0-0.2","tpValue":"0.5-1","phValue":"123","electricValue":null,"doValue":null,"nh4Value":null,"arrImgs":["/storage/emulated/0/DCIM/Camera/1588056993447_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056966859_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056924771_s50.jpg"],"arrWaterImgs":["/storage/emulated/0/DCIM/Camera/1588056910006_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056993447.jpg","/storage/emulated/0/DCIM/Camera/1588056966859.jpg"],"selectDate":"2020-06-02 14:47:12","urlName":"saveEvidence","eventType":2,"toUpload":0},
+			// 	{"streetTownViliage":"月浦镇6","lnglat":[121.40429210781214,31.413948792749977],"lon":121.40429210781214,"lat":31.413948792749977,"address":"上海市宝山区月浦镇园和路256号","riverNameList":["马路河","杨盛河","宝钢护厂河","练祁河"],"riverNameAndLevel":[{"riverLevel":"区管","riverCode":"BS53","riverName":"马路河"},{"riverLevel":"区管","riverCode":"BS50","riverName":"杨盛河"},{"riverLevel":"区管","riverCode":"BS52","riverName":"宝钢护厂河"},{"riverLevel":"市管","riverCode":"BS37","riverName":"练祁河"}],"riverName":"马路河","riverLevel":"区管","riverCode":"BS53","outleteDirection":"东","flagOutlet":"是","entryRiverType":"明管","outletName":"雨水口","dischargeType":"间歇","dischargeSubtype":"无水","dischargeTypeDescribe":"其他","outfallArroundType":"居民区","sewageSourceType":"污水处理厂","suYuan":"是","pipelineCaliber":"123","setunit":"123","problemDescribe":"123","codValue":"0-30","nh3Value":"0-0.2","tpValue":"0.5-1","phValue":"123","electricValue":null,"doValue":null,"nh4Value":null,"arrImgs":["/storage/emulated/0/DCIM/Camera/1588056993447_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056966859_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056924771_s50.jpg"],"arrWaterImgs":["/storage/emulated/0/DCIM/Camera/1588056910006_s50.jpg","/storage/emulated/0/DCIM/Camera/1588056993447.jpg","/storage/emulated/0/DCIM/Camera/1588056966859.jpg"],"selectDate":"2020-06-02 14:47:12","urlName":"saveEvidence","eventType":1,"toUpload":0}
+			// ];
+			// var d = {};
+			// d.data = tmpUploadDatas;
+			// app.setSetting("uploadDatas",JSON.stringify(d));
+
+
+			uploadDatas = (JSON.parse(app.getSetting("uploadDatas"))).data;
+			// console.log("删减后重组大小--->" + uploadDatas.length);
+			console.log("initList和获取到要传的数据--->" + JSON.stringify(uploadDatas));
+			uploadDataArr = [];
+			var indexI = 0;
+			var indexJ = 0;
+			var html = '<form class="mui-input-group">';
+			for (value of uploadDatas) {
+				// console.log(JSON.stringify(uploadDatas[key]));
+				// if (value.toUpload == 0) {
+					html += '<div class="mui-left mui-input-row mui-checkbox" style="height: 100px;">';
+					html += '<label>';
+					html += '<p class="label-p">' + '位置：' + value.reportPlaceDescribe + '</p>';
+					html += '<p class="label-p">' + '时间：' + value.reportFoundTime + '</p>';
+					html += '<p class="label-p">' + '人员：' + userName + '</p>';
+					html += '</label>';
+					html += '<input class="div-input left_checkbox" name="subcheck" type="checkbox">';
+					html += '</div>';
+
+					uploadDataArr[indexI] = indexJ;
+					indexI = indexI + 1;
+				// }
+
+				indexJ = indexJ + 1;
+			}
+
+			$("form").html(html);
+
+			$(".left_checkbox").each(function(index, element) {
+				for (var i = 0; i < uploadIndexArr.length; i++) {
+					if (uploadIndexArr[i] == index) {
+						$(this).prop("checked", true);
+					}
+				}
+			});
+
+		}
+
+		function initView() {
+			btnSelectAll = $("#btnSelectAll");
+			btnCancelSelectAll = $("#btnCancelSelectAll");
+			btnUpload = $("#btnUpload");
+			btnDelete = $("#btnDelete");
+		}
+
+		function initListener() {
+
+			//"全选"按钮监听
+			btnSelectAll.click(function() {
+				uploadDatas = (JSON.parse(app.getSetting("uploadDatas"))).data;
+				$(".left_checkbox").each(function(index, e) {
+					// console.log(index);
+					$(this).prop("checked", true);
+				})
+			});
+
+			//"取消"按钮监听
+			btnCancelSelectAll.click(function() {
+				$(".left_checkbox").each(function() {
+					$(this).prop("checked", false)
+				})
+			});
+ 
+			//"上传"按钮监听
+			btnUpload.click(function() {
+				var flag = false;
+
+				var tmpUploadDatas = JSON.parse(app.getSetting("uploadDatas"));
+				uploadDatas = tmpUploadDatas.data;
+				uploadIndexArr = [];
+				$(".left_checkbox").each(function(index, element) {
+					var checked = $(this).prop("checked");
+					if (checked) {
+						flag = true;
+						// console.log("index--->" + index + " ,checked--->" + checked);
+						uploadIndexArr.push(index);
+
+						// console.log(uploadDataArr[index]);
+						uploadDatas[uploadDataArr[index]].toUpload = 1;
+					}
+				});
+				console.log("待上传数据下标--->" + JSON.stringify(uploadIndexArr));
+
+				if (flag) {
+					app.setSetting("intervalFlag", true);
+					app.setSetting("uploadDatas", JSON.stringify(tmpUploadDatas));
+				}
+
+				mui.back();
+			});
+
+			//"删除"按钮监听
+			btnDelete.click(function() {
+				uploadIndexArr = []; //待上传的数据在数组中的下标
+				$(".left_checkbox").each(function(index, element) {
+					if ($(this).prop("checked")) {
+						uploadIndexArr.push(index);
+					}
+				});
+				// console.log(JSON.stringify(uploadDatas));
+				// console.log(JSON.stringify(uploadIndexArr));
+				for (var i = 0; i < uploadIndexArr.length; i++) {
+					uploadDatas.splice(0, 1);
+				}
+				// console.log(JSON.stringify(uploadDatas));
+				var d = {};
+				d.data = uploadDatas;
+				app.setSetting("uploadDatas", JSON.stringify(d));
+
+				initList();
+			});
+
+			$("label").each(function(index, element) {
+				$(this).click(function() {
+					console.log(index);
+					var data = uploadDatas[index];
+					// console.log(JSON.stringify(data))
+
+					if (data.eventType == 2) {
+						app.open("waterEditAndUpload.html?index=" + index);
+					} else if (data.eventType == 1) {
+						app.open("editAndUpload.html?index=" + index);
+					}
+				})
+			});
+
+		}
+	</script>
+
+</html>

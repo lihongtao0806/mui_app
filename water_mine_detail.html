@@ -1,0 +1,446 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" type="text/css" />
+		<link href="css/iconfont.css" rel="stylesheet" type="text/css" />
+		<link href="./css/mui.picker.min.css" rel="stylesheet" />
+		<link href="./css/mui.poppicker.css" rel="stylesheet" />
+		<style>
+			#list-option .mui-table-view-cell button{
+				position: relative;
+				right: inherit;
+				-webkit-transform: inherit;
+				transform: inherit;
+			}
+			
+			.mui-table-view span.mui-pull-right {
+			    color: #999;
+			}
+			
+			.img-selected {
+				width:80px;
+				height:80px;
+				margin-top: 10px;
+			}
+			
+			.img-water-selected {
+				width:80px;
+				height:80px;
+				margin-top: 10px;
+			}
+		</style>
+	</head>
+
+	<body onload="app.route()">
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<a id="btnDelete" class="mui-btn mui-btn-link mui-pull-right btnDelete">删除</a>
+			<h1 class="mui-title">水质取证详情</h1>
+		</header>
+		
+		<div class="mui-content">
+			<ul id="list-option" class="mui-table-view" style="padding-bottom: 50px;">
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-yiliaohangyedeICON-"></i> 定位
+					<span style="color:red">*</span>
+					<span id="btnLocation" style="max-width: 100%;text-align: right;" class="mui-pull-right mui-ellipsis">请选择...</span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-heliu"></i> 河道
+					<span style="color:red">*</span>
+					<span id="select1" style="max-width: 100%;" class="mui-pull-right mui-ellipsis">请选择...</span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-quyuguanli"></i> 市/区/镇
+					<span style="color:red">*</span>
+					<span id="select2" style="max-width: 100%;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-dengji"></i> 河湖等级
+					<span style="color:red">*</span>
+					<span id="select5" style="max-width: 100%;" class="mui-pull-right mui-ellipsis">请选择...</span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-caozuo-moshi"></i> 水体编码
+					<span style="color:red">*</span>
+					<span id="select22" style="max-width: 100%;" class="mui-pull-right mui-ellipsis"></span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-caozuo-moshi"></i> COD（mg/L）
+					<!-- <span style="color:red">*</span> -->
+					<span id="select12" style="max-width: 100%;" class="mui-pull-right mui-ellipsis">请选择...</span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-caozuo-moshi"></i> 氨氮（mg/L）
+					<!-- <span style="color:red">*</span> -->
+					<span id="select13" style="max-width: 100%;" class="mui-pull-right mui-ellipsis">请选择...</span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont icon-caozuo-moshi"></i> 总磷（mg/L）
+					<!-- <span style="color:red">*</span> -->
+					<span id="select14" style="max-width: 100%;" class="mui-pull-right mui-ellipsis">请选择...</span>
+				</li>
+				<li class="mui-table-view-cell">
+					<i class="iconfont">pH</i>
+					<!-- <span style="color:red">*</span> -->
+					<textarea id="select15" rows="3" placeholder="请输入pH值"></textarea>
+				</li>
+				<li class="mui-table-view-cell">
+					<p style="color: #000000;font-weight: bolder;">水质监测图片 (最多<span id="max_photos">3</span>张)(长按显示操作菜单)
+						<button id="addWaterImgBtn" class="mui-btn mui-btn-primary mui-btn-outlined mui-pull-right">
+							<i class="iconfont icon-jia"></i>
+						</button>
+						<!-- <span style="color:red">*</span> -->
+					</p>
+					<div id="waterImgList">
+						<!-- <img src="asset/images/evid1.png" class="img-selected">
+						<img src="asset/images/evid1.png" class="img-selected">
+						<img src="asset/images/evid1.png" class="img-selected"> -->
+					</div>
+				</li>
+			</ul>
+		</div>
+		
+		<div id="picture" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a onclick="getImage()">拍照</a>
+				</li>
+				<li class="mui-table-view-cell">
+					<a onclick="galleryImgsMaximum()">选取现有的</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#picture"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+
+		<div id="img_action_list" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a onclick="delImg()">删除</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#img_action_list"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+
+		<div id="img_action_list" class="mui-popover mui-popover-action mui-popover-bottom">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a onclick="delImg()">删除</a>
+				</li>
+			</ul>
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell">
+					<a href="#img_action_list"><b>取消</b></a>
+				</li>
+			</ul>
+		</div>
+	</body>
+
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/mui.js"></script>
+	<script src="js/mui.picker.min.js"></script>
+	<script src="js/mui.poppicker.js"></script>
+	<script src="js/app.js"></script>
+	<script type="text/javascript">
+		//本地模拟Json数据
+		var dataJson;
+		var dictionary;
+		var uploadData = {};
+		var uploadDataIndex = 0;
+		var file_data_arr = []; //待上传图片数组
+		var imageFlag = true; //true:取证  false:水质监测
+		//"保存"按钮
+		var btnSave
+		//"提交"按钮
+		var btnSubmit;
+		//"定位"按钮
+		var btnLocation;
+		var btnLocationData = {};
+		//"河道"按钮
+		var select1;
+		var select1Data;
+		//"片区"按钮
+		var select2;
+		var select2Data;
+		//"区域"按钮
+		var select3;
+		var select3Data;
+		// "是否排口"按钮
+		var select24;
+		var select24Data;
+		// "排口名称"按钮
+		var select25;
+		var select25Data;
+		// "是否溯源"按钮
+		var select26;
+		var select26Data;
+		//"设置主体"按钮
+		var select27;
+		var select27Data;
+		//"排污类别"按钮
+		var select4;
+		var select4Data;
+		//"河湖等级"按钮
+		var select5;
+		var select5Data;
+		//"水体编码"按钮
+		var select22;
+		var select22Data;
+		//"排口方向"按钮
+		var select23;
+		var select23Data;
+		//"排放方式"按钮
+		var select6;
+		var select6Data;
+		//"入河方式"按钮
+		var select7;
+		var select7Data;
+		//"发现时间"按钮
+		var selectDate;
+		var selectDateData;
+		//位置描述
+		var select8;
+		var select8Data;
+		var select9;
+		var select9Data;
+		//"排口状况描述"按钮
+		var select10;
+		var select10Data;
+		//"管道口径"按钮
+		var select11;
+		var select11Data;
+		//"COD"
+		var select12;
+		var select12Data;
+		//"氨氮"
+		var select13;
+		var select13Data;
+		//"总磷"
+		var select14;
+		var select14Data;
+		//"PH"
+		var select15;
+		//"电导率"
+		var select16;
+		//"溶解氧"
+		var select17;
+		//"NH4+"
+		var select18;
+		//排放方式子类别
+		var select19;
+		//排放方式描述
+		var select20;
+		//污水疑似来源
+		var select21;
+		var select19view;
+		var select20view;
+		var select21view;
+		//"图片列表 取证"显示控件
+		var imgList;
+		//"图片列表 水质监测"显示控件
+		var waterImgList;
+		//"新增图片 取证"按钮
+		var addImgBtn;
+		//"图片列表 取证"操作对象
+		var currentImgItem = null;
+		//"新增图片 水质监测"按钮
+		var addWaterImgBtn;
+		//"图片列表 水质监测"操作对象
+		var currentWaterImgItem = null;
+
+		$(document).ready(function() {
+			mui.init({
+				gestureConfig: {
+					longtap: true, //默认为false
+				}
+			})
+
+			mui.plusReady(function() {
+				init();
+			})
+		});
+
+		function init() {
+			initView();
+			initData();
+			initListener();
+		}
+
+		function initView() {
+			btnSave = $("#btnSave");
+			btnSubmit = $("#btnSubmit");
+			btnDelete = $("#btnDelete");
+			btnLocation = $("#btnLocation");
+			//给"定位"按钮设置样式,防止经纬度过长显示跳行的问题
+			btnLocation.css({
+				"width": "70%"
+			});
+			select1 = $("#select1");
+			select2 = $("#select2");
+			select3 = $("#select3");
+			select4 = $("#select4");
+			select5 = $("#select5");
+			select6 = $("#select6");
+			select7 = $("#select7");
+			selectDate = $("#selectDate");
+			select8 = $("#select8");
+			select9 = $("#select9");
+			select10 = $("#select10");
+			select11 = $("#select11");
+			select12 = $("#select12");
+			select13 = $("#select13");
+			select14 = $("#select14");
+			select15 = $("#select15");
+			select16 = $("#select16");
+			select17 = $("#select17");
+			select18 = $("#select18");
+			select19 = $("#select19");
+			select20 = $("#select20");
+			select21 = $("#select21");
+			select22 = $("#select22");
+			select23 = $("#select23");
+			select24 = $("#select24");
+			select25 =  $("#select25");
+			select26 =  $("#select26");
+			select27 = $("#select27");
+			
+			select19view = $("#select19view");
+			select20view = $("#select20view");
+			select21view = $("#select21view");
+			imgList = document.getElementById('imgList');
+			waterImgList = document.getElementById('waterImgList');
+			addImgBtn = $("#addImgBtn");
+			addWaterImgBtn = $("#addWaterImgBtn");
+
+		}
+
+		function initData() {
+			var reportSerialId = app.getUrlParam('reportSerialId');
+			console.log("前一页面传递过来的值--->" + reportSerialId);
+			//根据reportSerialId，请求获取图片等单子数据
+			app.ajax(app.url('selectByWaterReportSerialId'), {
+				"reportSerialId": reportSerialId
+			}, function(ret) {
+				if (ret.code == 200) {
+					// console.log("水质取证信息--->" + JSON.stringify(ret.data));
+					initEvidence(ret.data);
+				} else {
+					mui.toast(ret.msg);
+				}
+			});
+		}
+
+		function initListener() {
+			//删除该条记录
+			btnDelete.click(function() {
+				var reportSerialId = app.getUrlParam('reportSerialId');
+				app.ajax(app.url('modifyWaterFlagDeleteByReportSerialId'), {
+					"reportSerialId": reportSerialId
+				}, function(ret) {
+					// console.log("取证数据：" + JSON.stringify(ret.data));
+					if (ret.code == 200) {
+						mui.toast("删除成功!");
+
+						//重置上一个页面
+						var self = plus.webview.currentWebview();
+						var opener = self.opener();
+						mui.fire(opener, 'reloadMineWebview', {
+							"reloadMineWebview": {
+								"reportSerialId": reportSerialId
+							}
+						});
+						mui.fire(opener, 'reloadWebview', {
+							"reloadWebview": {}
+						});
+
+						mui.back();
+					} else {
+
+					}
+				});
+			});
+		}
+
+		function initEvidence(evidence) {
+			//定位赋值
+			btnLocation.html(evidence.lon + "," + evidence.lat);
+			select1.html(evidence.riverName);
+			select2.html(evidence.streetTownViliage);
+
+			var dictionaryKeyReverse = JSON.parse(app.getSetting("dictionaryKeyReverse"));
+			// console.log("--->"+uploadData.outfallArroundType);
+			select3.html(dictionaryKeyReverse[evidence.outfallArroundType]);
+			select4.html(dictionaryKeyReverse[evidence.outfallType]);
+			select5.html(dictionaryKeyReverse[evidence.riverLevel]);
+			select6.html(dictionaryKeyReverse[evidence.dischargeType]);
+			if (evidence.dischargeSubtype) {
+				select19.html(dictionaryKeyReverse[evidence.dischargeSubtype]);
+			}
+			if (evidence.dischargeTypeDescribe) {
+				select20.html(dictionaryKeyReverse[evidence.dischargeTypeDescribe]);
+			}
+			// console.log(evidence.entryRiverType);
+			select7.html(dictionaryKeyReverse[evidence.entryRiverType]);
+			selectDate.html(evidence.selectDate);
+			select12.html(evidence.codValue);
+			select13.html(evidence.nh3Value);
+			select14.html(evidence.tpValue);
+			select9.html(evidence.reportPlaceDescribe);
+			select10.html(evidence.problemDescribe);
+			select11.html(evidence.pipelineCaliber);
+			select15.html(evidence.phValue);
+			select16.html(evidence.electricValue);
+			select17.html(evidence.doValue);
+			select18.html(evidence.nh4Value);
+			if (!evidence.dischargeType) {
+				// select19view.hide();
+				select20view.hide();
+			}
+			// console.log(evidence.sewageSourceType)
+			select21.html(dictionaryKeyReverse[evidence.sewageSourceType]);
+			select22.html(evidence.riverCode);
+			select23.html(evidence.outletDirection)
+			select24.html(evidence.flagOutlet == 0 ? '是' : '否')
+			select25.html(evidence.outletName);
+			// console.log("--->"+JSON.stringify(evidence))
+			select26.html(evidence.suYuan == 1 ? '是' : '否');
+			//"设置主体描述"按钮
+			select27.html(evidence.setunit);
+			
+
+			//图片赋值
+			var arrImgs = evidence.arrImgs;
+			var arrWaterImgs = evidence.arrWaterImgs;
+			if(arrImgs!=null){
+				for (var i = 0; i < arrImgs.length; i++) {
+					var newImg = document.createElement('img');
+					newImg.src = app.getUrl() + "images/thumb/" + arrImgs[i];
+					// console.log(newImg.src)
+					newImg.classList.add("img-selected");
+					imgList.appendChild(newImg);
+				}
+			}
+			if(arrWaterImgs!=null) {
+				for (var i = 0; i < arrWaterImgs.length; i++) {
+					var newImg = document.createElement('img');
+					newImg.src = app.getUrl() + "images/thumb/" + arrWaterImgs[i];
+					newImg.classList.add("img-water-selected");
+					waterImgList.appendChild(newImg);
+				}
+			}
+		}
+	</script>
+
+</html>

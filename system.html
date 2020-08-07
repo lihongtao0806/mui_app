@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+		<link href="css/mui.css" rel="stylesheet" type="text/css" />
+		<link href="css/iconfont.css" rel="stylesheet" type="text/css" />
+		<link href="css/ol.css" rel="stylesheet" type="text/css" />
+		<style type="text/css">
+
+		</style>
+		<!-- 字体相关 -->
+		<link rel="stylesheet" type="text/css" href="lib/css/iconfont.css" />
+		<!-- 弹出框样式 -->
+		<link rel="stylesheet" type="text/css" href="css/popup.css" />
+	</head>
+
+	<body onload="app.route()">
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">我的</h1>
+		</header>
+		<div class="mui-content">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell mui-media">
+					<a href="javascript:;">
+						<!-- <img class="mui-media-object mui-pull-left" src="asset/images/dingwei.png"> -->
+						<i class="mui-media-object mui-pull-left iconfont icon-shebeibanben"></i>
+						<div class="mui-media-body">
+							版本号
+							<p id="version" class="mui-ellipsis" style="color: red;"></p>
+						</div>
+					</a>
+				</li>
+				<li id="clearCache" class="mui-table-view-cell mui-media">
+					<a href="javascript:;">
+						<!-- <img class="mui-media-object mui-pull-left" src="asset/images/dingwei.png"> -->
+						<i class="mui-media-object mui-pull-left iconfont icon-shebeibanben"></i>
+						<div class="mui-media-body">
+							清除缓存
+							<p class="mui-ellipsis" style="color: red;">注意：一旦清除不可恢复！</p>
+						</div>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</body>
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="js/ol.js"></script>
+	<script src="js/mui.js"></script>
+	<script src="js/app.js"></script>
+	<script type="text/javascript">
+		var clearCache = null;
+		
+		$(document).ready(function() {
+			mui.init();
+			mui.plusReady(function() {
+				initView();
+				initListener();
+			})
+		});
+
+		function initView() {
+			clearCache = $("#clearCache");
+		}
+		
+		function initListener() {
+			mui.getJSON("manifest.json", null, function(manifest) {
+				var versionNameClient = manifest.version.name;
+				var versionCodeClient = Number(manifest.version.code);
+				// console.log("本地版本名称：" + versionNameClient + "，本地版本code：" + versionCodeClient);
+				$("#version").html(versionNameClient);
+			})
+			
+			clearCache.click(function(){
+				plus.cache.calculate(function(size) {
+					console.log(size)
+					sizeCache = size;
+					var size_m = parseFloat(sizeCache / (1024 * 1024)).toFixed(2);
+					if (size_m > 1) {
+						mui.confirm("您目前的系统缓存为" + size_m + "M？", "清除缓存", ["确认", "取消"], function(e) {
+							if (e.index == 1) {} else {
+								plus.cache.clear(function() {
+									mui.toast("缓存清除完毕!")
+								});
+							}
+						});
+					}else{
+						mui.toast("清除完毕！")
+					}
+				});
+			})
+		}
+	</script>
+
+</html>
